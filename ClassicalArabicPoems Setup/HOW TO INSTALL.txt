@@ -1,0 +1,19 @@
+====================< ClassicalArabicPoems >=======================
+
+                    ------- Install -------
+NOTE: Download the xampp installer and place it in the same directory as of 'instal.bat' file.
+----- xampp installer name must be 'xampp_installer'.
+1|--> Ensure that no folder named `xampp` exists in C: drive.
+2|--> Run the Installer.bat file
+3|--> It will first open the xampp installation wizard
+NOTE: Don't change the xampp installation direcotry while installing it, remain it as C:\xampp 
+4|--> Then the application setup wizard popup
+5|--> The program will install accordingly
+
+        -------- If xampp already install --------
+1|--> Ensure that xampp already installed in C:\xampp
+2|--> Run the ClassicalArabicPoems.exe
+3|--> Go to the installation directory of project (If project already installed)
+----- Default Location: C:\Program Files (x86)\ClassicalArabicPoems
+4|--> Run the databaseSetup.bat file
+5|--> it will add the db in mysql

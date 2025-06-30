@@ -1,0 +1,82 @@
+@echo off
+
+REM Create the xampp directory in C:\
+mkdir C:\xampp
+
+REM Set the installation directory for XAMPP
+set XAMPP_INSTALL_DIR=C:\xampp
+
+REM Set MySQL connection details
+set DB_HOST=localhost
+set DB_PORT=3306
+set DB_USER=root
+set DB_PASSWORD=
+set DB_NAME=classicalarabicpoems
+set SQL_SCRIPT_PATH=C:\Program Files (x86)\ClassicalArabicPoems\db\setup.sql
+
+REM Initialize boolean variables
+set XAMPP_INSTALLED=false
+set DATABASE_ADDED=false
+
+REM Check if xampp_installer.exe exists in the script directory
+if exist "%SCRIPT_DIR%xampp_installer.exe" (
+    REM Check if XAMPP is already installed
+    if exist "%XAMPP_INSTALL_DIR%\xampp_start.exe" (
+        echo XAMPP is already installed.
+    ) else (
+
+       echo Removing existing contents of %XAMPP_INSTALL_DIR%...
+       rmdir /s /q "%XAMPP_INSTALL_DIR%\*"
+    
+       REM Install XAMPP silently
+       echo Installing XAMPP...
+       xampp_installer.exe
+    
+       REM Move the installed XAMPP to the desired location
+       move xampp "%XAMPP_INSTALL_DIR%"
+
+       set XAMPP_INSTALLED=true
+    )
+
+    REM Start Apache and MySQL using xampp_start
+    echo Starting Apache and MySQL...
+    "%XAMPP_INSTALL_DIR%\xampp_start.exe"
+
+    REM Wait for services to start (adjust the sleep time as needed)
+    timeout /nobreak /t 3
+
+    REM Check if the database exists
+    echo Checking if the database exists...
+    "%XAMPP_INSTALL_DIR%\mysql\bin\mysql.exe" -h%DB_HOST% -P%DB_PORT% -u%DB_USER% -p%DB_PASSWORD% -e "SHOW DATABASES LIKE '%DB_NAME%'" | findstr /R /C:"%DB_NAME%" >nul
+    if %errorlevel% equ 0 (
+        echo Database '%DB_NAME%' already exists.
+    ) else (
+        echo Database '%DB_NAME%' does not exist.
+        REM Run the setup executable
+        echo Running ClassicalArabicPoems.exe...
+        start /wait ClassicalArabicPoems.exe
+    
+        REM Execute SQL script to add the database
+        echo Adding database...
+        "%XAMPP_INSTALL_DIR%\mysql\bin\mysql.exe" -h%DB_HOST% -P%DB_PORT% -u%DB_USER% -p%DB_PASSWORD% < "%SQL_SCRIPT_PATH%"
+
+        set DATABASE_ADDED=true
+    )
+
+    REM Display completion message if both conditions are true
+    if "%XAMPP_INSTALLED%"=="true" if "%DATABASE_ADDED%"=="true" (
+        echo Installation completed successfully.
+    ) else (
+        echo Nothing happened.
+    )
+
+    REM Stop Apache and MySQL using xampp_stop
+    echo Stoping Apache and MySQL...
+    "%XAMPP_INSTALL_DIR%\xampp_stop.exe"
+) else (
+    echo Error: xampp_installer.exe not found in the script directory.
+)
+
+
+REM Pause to keep the command prompt window open (remove if not needed)
+pause
